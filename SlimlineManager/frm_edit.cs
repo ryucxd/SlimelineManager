@@ -33,16 +33,41 @@ namespace SlimlineManager
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     da.Fill(dt);
                     dataGridView1.DataSource = dt;
-                    dataGridView1.Columns[0].HeaderText = "ID";
-                    dataGridView1.Columns[1].HeaderText = "Door ID";
-                    dataGridView1.Columns[2].HeaderText = "Part Complete Date";
-                    dataGridView1.Columns[3].HeaderText = "Time for Part";
-                    dataGridView1.Columns[4].HeaderText = "Operation";
-                    dataGridView1.Columns[5].HeaderText = "Name";
-                    dataGridView1.Columns[6].HeaderText = "Part % completed";
                     conn.Close();
                 }
             }
+            //load the DGV into each text boxes. trying a new layout than last time.
+            lbl_title.Text = "Door ID = " + dataGridView1.Rows[0].Cells[1].Value.ToString();
+            locked_part_complete_date.Text = dataGridView1.Rows[0].Cells[2].Value.ToString();
+            locked_time_for_part.Text = dataGridView1.Rows[0].Cells[3].Value.ToString();
+            locked_operation.Text = dataGridView1.Rows[0].Cells[4].Value.ToString();
+            locked_name.Text = dataGridView1.Rows[0].Cells[5].Value.ToString();
+            locked_part_percent_complete.Text = dataGridView1.Rows[0].Cells[6].Value.ToString();
+
+            //load them into the editable textboxes too
+            //split the date and time apart to allow for a kinder interface
+
+            //dte_time.Value = Convert.ToDateTime(time)
+            string test = dataGridView1.Rows[0].Cells[2].Value.ToString();
+            string date = test.Substring(0,10);
+             test = test.Remove(0,11);
+            string time = test;
+            MessageBox.Show(test);
+            MessageBox.Show(time);
+            dte_date.Value = Convert.ToDateTime(date);
+            dte_time.Value = Convert.ToDateTime(time);
+            txt_part_complete_date.Text = dataGridView1.Rows[0].Cells[2].Value.ToString();
+            //copy others 1:1
+            txt_time_for_part.Text = dataGridView1.Rows[0].Cells[3].Value.ToString();
+            txt_operation.Text = dataGridView1.Rows[0].Cells[4].Value.ToString();
+            txt_name.Text = dataGridView1.Rows[0].Cells[5].Value.ToString();
+            txt_part_percent_complete.Text = dataGridView1.Rows[0].Cells[6].Value.ToString();
+        }
+
+        private void Btn_close_Click(object sender, EventArgs e)
+        {
+            //this needs to go back to the main form but also select the correct number entered to have the end user start exactly where it transistioned from
+            Application.Restart();
         }
     }
 }
