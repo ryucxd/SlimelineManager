@@ -42,13 +42,12 @@
             this.label5 = new System.Windows.Forms.Label();
             this.locked_part_percent_complete = new System.Windows.Forms.TextBox();
             this.txt_part_percent_complete = new System.Windows.Forms.TextBox();
-            this.txt_name = new System.Windows.Forms.TextBox();
-            this.txt_operation = new System.Windows.Forms.TextBox();
             this.txt_time_for_part = new System.Windows.Forms.TextBox();
-            this.txt_part_complete_date = new System.Windows.Forms.TextBox();
             this.btn_close = new System.Windows.Forms.Button();
             this.dte_date = new System.Windows.Forms.DateTimePicker();
             this.dte_time = new System.Windows.Forms.DateTimePicker();
+            this.cmb_name = new System.Windows.Forms.ComboBox();
+            this.cmb_operation = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -176,20 +175,8 @@
             this.txt_part_percent_complete.Name = "txt_part_percent_complete";
             this.txt_part_percent_complete.Size = new System.Drawing.Size(78, 20);
             this.txt_part_percent_complete.TabIndex = 19;
-            // 
-            // txt_name
-            // 
-            this.txt_name.Location = new System.Drawing.Point(403, 107);
-            this.txt_name.Name = "txt_name";
-            this.txt_name.Size = new System.Drawing.Size(100, 20);
-            this.txt_name.TabIndex = 18;
-            // 
-            // txt_operation
-            // 
-            this.txt_operation.Location = new System.Drawing.Point(285, 107);
-            this.txt_operation.Name = "txt_operation";
-            this.txt_operation.Size = new System.Drawing.Size(100, 20);
-            this.txt_operation.TabIndex = 17;
+            this.txt_part_percent_complete.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txt_part_percent_complete.TextChanged += new System.EventHandler(this.Txt_part_percent_complete_TextChanged);
             // 
             // txt_time_for_part
             // 
@@ -197,13 +184,7 @@
             this.txt_time_for_part.Name = "txt_time_for_part";
             this.txt_time_for_part.Size = new System.Drawing.Size(100, 20);
             this.txt_time_for_part.TabIndex = 16;
-            // 
-            // txt_part_complete_date
-            // 
-            this.txt_part_complete_date.Location = new System.Drawing.Point(12, 148);
-            this.txt_part_complete_date.Name = "txt_part_complete_date";
-            this.txt_part_complete_date.Size = new System.Drawing.Size(120, 20);
-            this.txt_part_complete_date.TabIndex = 15;
+            this.txt_time_for_part.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // btn_close
             // 
@@ -232,20 +213,35 @@
             this.dte_time.Size = new System.Drawing.Size(70, 20);
             this.dte_time.TabIndex = 22;
             // 
+            // cmb_name
+            // 
+            this.cmb_name.FormattingEnabled = true;
+            this.cmb_name.Location = new System.Drawing.Point(403, 110);
+            this.cmb_name.Name = "cmb_name";
+            this.cmb_name.Size = new System.Drawing.Size(110, 21);
+            this.cmb_name.TabIndex = 23;
+            // 
+            // cmb_operation
+            // 
+            this.cmb_operation.FormattingEnabled = true;
+            this.cmb_operation.Location = new System.Drawing.Point(280, 106);
+            this.cmb_operation.Name = "cmb_operation";
+            this.cmb_operation.Size = new System.Drawing.Size(110, 21);
+            this.cmb_operation.TabIndex = 24;
+            // 
             // frm_edit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(657, 201);
             this.ControlBox = false;
+            this.Controls.Add(this.cmb_operation);
+            this.Controls.Add(this.cmb_name);
             this.Controls.Add(this.dte_time);
             this.Controls.Add(this.dte_date);
             this.Controls.Add(this.btn_close);
             this.Controls.Add(this.txt_part_percent_complete);
-            this.Controls.Add(this.txt_name);
-            this.Controls.Add(this.txt_operation);
             this.Controls.Add(this.txt_time_for_part);
-            this.Controls.Add(this.txt_part_complete_date);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.locked_part_percent_complete);
             this.Controls.Add(this.label4);
@@ -284,12 +280,11 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox locked_part_percent_complete;
         private System.Windows.Forms.TextBox txt_part_percent_complete;
-        private System.Windows.Forms.TextBox txt_name;
-        private System.Windows.Forms.TextBox txt_operation;
         private System.Windows.Forms.TextBox txt_time_for_part;
-        private System.Windows.Forms.TextBox txt_part_complete_date;
         private System.Windows.Forms.Button btn_close;
         private System.Windows.Forms.DateTimePicker dte_date;
         private System.Windows.Forms.DateTimePicker dte_time;
+        private System.Windows.Forms.ComboBox cmb_name;
+        private System.Windows.Forms.ComboBox cmb_operation;
     }
 }
