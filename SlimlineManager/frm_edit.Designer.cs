@@ -48,6 +48,11 @@
             this.dte_time = new System.Windows.Forms.DateTimePicker();
             this.cmb_name = new System.Windows.Forms.ComboBox();
             this.cmb_operation = new System.Windows.Forms.ComboBox();
+            this.lbl_time = new System.Windows.Forms.Label();
+            this.txt_total_time = new System.Windows.Forms.TextBox();
+            this.lbl_old = new System.Windows.Forms.Label();
+            this.txt_old_time = new System.Windows.Forms.TextBox();
+            this.btn_confirm = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -171,7 +176,7 @@
             // 
             // txt_part_percent_complete
             // 
-            this.txt_part_percent_complete.Location = new System.Drawing.Point(533, 107);
+            this.txt_part_percent_complete.Location = new System.Drawing.Point(533, 93);
             this.txt_part_percent_complete.Name = "txt_part_percent_complete";
             this.txt_part_percent_complete.Size = new System.Drawing.Size(78, 20);
             this.txt_part_percent_complete.TabIndex = 19;
@@ -180,11 +185,12 @@
             // 
             // txt_time_for_part
             // 
-            this.txt_time_for_part.Location = new System.Drawing.Point(169, 107);
+            this.txt_time_for_part.Location = new System.Drawing.Point(169, 93);
             this.txt_time_for_part.Name = "txt_time_for_part";
             this.txt_time_for_part.Size = new System.Drawing.Size(100, 20);
             this.txt_time_for_part.TabIndex = 16;
             this.txt_time_for_part.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txt_time_for_part.TextChanged += new System.EventHandler(this.Txt_time_for_part_TextChanged);
             // 
             // btn_close
             // 
@@ -200,7 +206,7 @@
             // dte_date
             // 
             this.dte_date.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dte_date.Location = new System.Drawing.Point(12, 107);
+            this.dte_date.Location = new System.Drawing.Point(12, 93);
             this.dte_date.Name = "dte_date";
             this.dte_date.Size = new System.Drawing.Size(79, 20);
             this.dte_date.TabIndex = 21;
@@ -208,7 +214,7 @@
             // dte_time
             // 
             this.dte_time.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.dte_time.Location = new System.Drawing.Point(93, 107);
+            this.dte_time.Location = new System.Drawing.Point(93, 93);
             this.dte_time.Name = "dte_time";
             this.dte_time.Size = new System.Drawing.Size(70, 20);
             this.dte_time.TabIndex = 22;
@@ -216,7 +222,7 @@
             // cmb_name
             // 
             this.cmb_name.FormattingEnabled = true;
-            this.cmb_name.Location = new System.Drawing.Point(403, 110);
+            this.cmb_name.Location = new System.Drawing.Point(403, 92);
             this.cmb_name.Name = "cmb_name";
             this.cmb_name.Size = new System.Drawing.Size(110, 21);
             this.cmb_name.TabIndex = 23;
@@ -224,10 +230,63 @@
             // cmb_operation
             // 
             this.cmb_operation.FormattingEnabled = true;
-            this.cmb_operation.Location = new System.Drawing.Point(280, 106);
+            this.cmb_operation.Location = new System.Drawing.Point(280, 92);
             this.cmb_operation.Name = "cmb_operation";
             this.cmb_operation.Size = new System.Drawing.Size(110, 21);
             this.cmb_operation.TabIndex = 24;
+            // 
+            // lbl_time
+            // 
+            this.lbl_time.AutoSize = true;
+            this.lbl_time.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl_time.Location = new System.Drawing.Point(-1, 126);
+            this.lbl_time.Name = "lbl_time";
+            this.lbl_time.Size = new System.Drawing.Size(176, 19);
+            this.lbl_time.TabIndex = 26;
+            this.lbl_time.Text = "New TOTAL time for parts";
+            this.lbl_time.Visible = false;
+            // 
+            // txt_total_time
+            // 
+            this.txt_total_time.Location = new System.Drawing.Point(181, 125);
+            this.txt_total_time.Name = "txt_total_time";
+            this.txt_total_time.ReadOnly = true;
+            this.txt_total_time.Size = new System.Drawing.Size(100, 20);
+            this.txt_total_time.TabIndex = 25;
+            this.txt_total_time.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txt_total_time.Visible = false;
+            // 
+            // lbl_old
+            // 
+            this.lbl_old.AutoSize = true;
+            this.lbl_old.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl_old.Location = new System.Drawing.Point(16, 154);
+            this.lbl_old.Name = "lbl_old";
+            this.lbl_old.Size = new System.Drawing.Size(163, 19);
+            this.lbl_old.TabIndex = 28;
+            this.lbl_old.Text = "OLD total time for parts";
+            this.lbl_old.Visible = false;
+            // 
+            // txt_old_time
+            // 
+            this.txt_old_time.Location = new System.Drawing.Point(182, 155);
+            this.txt_old_time.Name = "txt_old_time";
+            this.txt_old_time.ReadOnly = true;
+            this.txt_old_time.Size = new System.Drawing.Size(100, 20);
+            this.txt_old_time.TabIndex = 27;
+            this.txt_old_time.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txt_old_time.Visible = false;
+            // 
+            // btn_confirm
+            // 
+            this.btn_confirm.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_confirm.Location = new System.Drawing.Point(505, 162);
+            this.btn_confirm.Name = "btn_confirm";
+            this.btn_confirm.Size = new System.Drawing.Size(67, 27);
+            this.btn_confirm.TabIndex = 29;
+            this.btn_confirm.Text = "Confirm";
+            this.btn_confirm.UseVisualStyleBackColor = true;
+            this.btn_confirm.Click += new System.EventHandler(this.Btn_confirm_Click);
             // 
             // frm_edit
             // 
@@ -235,6 +294,11 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(657, 201);
             this.ControlBox = false;
+            this.Controls.Add(this.btn_confirm);
+            this.Controls.Add(this.lbl_old);
+            this.Controls.Add(this.txt_old_time);
+            this.Controls.Add(this.lbl_time);
+            this.Controls.Add(this.txt_total_time);
             this.Controls.Add(this.cmb_operation);
             this.Controls.Add(this.cmb_name);
             this.Controls.Add(this.dte_time);
@@ -286,5 +350,10 @@
         private System.Windows.Forms.DateTimePicker dte_time;
         private System.Windows.Forms.ComboBox cmb_name;
         private System.Windows.Forms.ComboBox cmb_operation;
+        private System.Windows.Forms.Label lbl_time;
+        private System.Windows.Forms.TextBox txt_total_time;
+        private System.Windows.Forms.Label lbl_old;
+        private System.Windows.Forms.TextBox txt_old_time;
+        private System.Windows.Forms.Button btn_confirm;
     }
 }

@@ -16,6 +16,7 @@ namespace SlimlineManager
     {
         public int loop { get; set; }
         public string _id { get; set; }
+        public int staff_id { get; set; }
         public frm_edit(string passed_id)
         {
             InitializeComponent();
@@ -146,12 +147,32 @@ namespace SlimlineManager
         //maths for changing time for part
         private void maths_tfp()
         {
+            //old time
+            txt_old_time.Text = Convert.ToString(Math.Round((Convert.ToDecimal(dataGridView1.Rows[0].Cells[3].Value) / Convert.ToDecimal(dataGridView1.Rows[0].Cells[6].Value)), 2));
             //find the time for part if the percent complete was 1
             //then use that new % to find out what the new total time should be 
             //old time was 10 and the new time is 20 then the total time should effectively double
             //also need validation like the other function
-        
+            decimal percentage;
+            decimal time;
 
+            if (string.IsNullOrEmpty(txt_part_percent_complete.Text))
+                percentage = Convert.ToDecimal(dataGridView1.Rows[0].Cells[6].Value);
+            else
+                percentage = Convert.ToDecimal(txt_part_percent_complete.Text);
+
+            if (string.IsNullOrEmpty(txt_time_for_part.Text))
+                time = Convert.ToDecimal(dataGridView1.Rows[0].Cells[3].Value);
+            else
+                time = Convert.ToDecimal(txt_time_for_part.Text);
+            decimal one_hundread_percent = Convert.ToDecimal(time) / Convert.ToDecimal(percentage);
+            lbl_time.Visible = true;
+            txt_total_time.Visible = true;
+            lbl_old.Visible = true;
+            txt_old_time.Visible = true;
+            if (one_hundread_percent < 0)
+                one_hundread_percent = one_hundread_percent * -1;
+            txt_total_time.Text = Math.Round(one_hundread_percent, 2).ToString();
         }
 
         //maths for changing part % complete#
@@ -224,7 +245,159 @@ namespace SlimlineManager
             else if (txt_part_percent_complete.Text == dataGridView1.Rows[0].Cells[6].Value.ToString())
             {
                 txt_time_for_part.Text = dataGridView1.Rows[0].Cells[3].Value.ToString();
+            }
 
+        }
+
+        private void Txt_time_for_part_TextChanged(object sender, EventArgs e)
+        {
+            if (txt_time_for_part.Text != dataGridView1.Rows[0].Cells[3].Value.ToString())
+            {
+                maths_tfp();
+                txt_part_percent_complete.Enabled = false;
+                return;
+            }
+
+
+        }
+
+        private void Btn_confirm_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Are you sure you want to update this record?", "UPDATE", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                MessageBox.Show("yeet");
+                string date = (dte_date.Value.ToString().Substring(0, 10) + dte_time.Value.ToString().Substring(10, 9));
+                DateTime part_date = Convert.ToDateTime(date);
+               
+                get_user();
+                update(part_date);
+                complete();
+
+                //daily goals needs to be updated last.
+                daily_goals(part_date);
+            }
+            else
+                return;
+        }
+
+        private void get_user()
+        {
+            using (SqlConnection conn = new SqlConnection(CONNECT.ConnectionStringUser))
+            {
+                using (SqlCommand cmd = new SqlCommand("select id from dbo.[user] where forename + ' ' + surname = '" + cmb_name.Text + "'", conn))
+                {
+                    conn.Open();
+                    staff_id = Convert.ToInt32(cmd.ExecuteScalar());
+                    MessageBox.Show(staff_id.ToString());
+                }
+            }
+        }
+        private void update(DateTime passed_date)
+        {
+            using (SqlConnection conn = new SqlConnection(CONNECT.ConnectionString))
+            {
+                string sql = "update dbo.door_part_completion_log SET ";
+                sql = sql + "time_for_part = " + txt_time_for_part.Text + ",";
+                sql = sql + "op = '" + cmb_operation.Text + "',";
+                sql = sql + "staff_id = " + staff_id.ToString() + ",";
+                sql = sql + "part_percent_complete = " + txt_part_percent_complete.Text + ",";
+                sql = sql.Remove(sql.Length - 1);
+                sql = sql + " where id  = " + dataGridView1.Rows[0].Cells[0].Value.ToString();
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    conn.Open();
+                    //    cmd.ExecuteNonQuery();
+                    MessageBox.Show(sql);
+                    conn.Close();
+                }
+            }
+        }
+        private void complete()
+        {
+            //this updates the X_complete area ONLY if part percent is 1
+            //maybe ask tom if this needs to add all the parts from the list rather than just 
+            if (txt_part_percent_complete.Text == "1")
+            {
+                string sql;
+                string operation = dataGridView1.Rows[0].Cells[4].Value.ToString();
+                sql = "update dbo.door SET ";
+                //all of the SL variants 
+                if (operation == "SL_Buff")
+                    sql = sql + "date_SL_buff_complete = GETDATE(), complete_SL_buff = 1 ";
+                if (operation == "SL_Pack")
+                    sql = sql + "date_pack_complete = GETDATE(), complete_pack = 1  ";
+                if (operation == "SL_Stores")
+                    sql = sql + "date_sl_stores_complete = GETDATE(), complete_SL_stores = 1 ";
+                //normal variants 
+                if (operation == "Assembly")
+                    sql = sql + "date_assembly_complete = GETDATE(), complete_assembly = 1 ";
+                if (operation == "Cutting")
+                    sql = sql + "date_cutting_complete = GETDATE(), complete_cutting = 1 ";
+                if (operation == "Prepping")
+                    sql = sql + "date_prepping_complete = GETDATE(), complete_prep = 1 ";
+
+                if (sql.Length > 25)
+                {
+                    sql = sql + "WHERE id = " + dataGridView1.Rows[0].Cells[1].Value.ToString();
+                    using (SqlConnection conn = new SqlConnection(CONNECT.ConnectionString))
+                    {
+                        using (SqlCommand cmd = new SqlCommand(sql, conn))
+                        {
+                            //MessageBox.Show(sql);
+                            conn.Open();
+                            MessageBox.Show(sql);// cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+            }
+        }
+        private void daily_goals(DateTime passed_date)
+        {
+            //get date time fixed
+            DateTime date_SOD = passed_date; //this is for the first minute of the day
+            MessageBox.Show(date_SOD.ToString());
+            date_SOD = date_SOD.AddHours(-date_SOD.Hour).AddMinutes(-date_SOD.Minute).AddSeconds(-date_SOD.Second);
+            MessageBox.Show(date_SOD.ToString());
+            DateTime date_EOD; //this is for the final minute of the day -- for daily goals calculation
+            date_EOD = date_SOD.AddHours(23).AddMinutes(59).AddSeconds(59);
+            MessageBox.Show(date_EOD.ToString());
+
+
+            string sql = "select COALESCE(sum(time_for_part / 60),-1) as time from dbo.door_part_completion_log a " +
+           "LEFT JOIN [user_info].dbo.[user] b on a.staff_id = b.id " +
+           "LEFT JOIN  dbo.door c ON a.door_id = c.id " +
+           "LEFT JOIN dbo.door_type d on c.door_type_id = d.id where a.part_percent_complete is not null and part_complete_date >= '" + date_SOD.ToString("yyyy-MM-dd HH:mm:ss") + "' " +
+           "AND part_complete_date <= '" + date_EOD.ToString("yyyy-MM-dd HH:mm:ss") + "'";
+            decimal actual_hours = 0;
+
+            using (SqlConnection conn = new SqlConnection(CONNECT.ConnectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    conn.Open();
+                    actual_hours = Convert.ToDecimal(cmd.ExecuteScalar());
+                    MessageBox.Show(actual_hours.ToString());
+                    conn.Close();
+                    if (actual_hours == -1)
+                    {
+                        MessageBox.Show("Please inform IT before trying again.", "ERROR", MessageBoxButtons.OK);
+                    }
+                }
+                sql = "UPDATE dbo.daily_department_goal " +
+                "SET actual_hours_slimline = " + actual_hours.ToString() +
+                " WHERE date_goal = '" + date_SOD.ToString("yyyy-MM-dd HH:mm:ss") + "'";
+                MessageBox.Show(sql);
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    //MessageBox.Show(sql);
+                    conn.Open();
+                //    cmd.ExecuteNonQuery();
+                    conn.Close();
+                }
             }
 
         }
