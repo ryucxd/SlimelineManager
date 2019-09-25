@@ -14,6 +14,7 @@ namespace SlimlineManager
     public partial class frm_main : Form
     {
         public string _id { get; set; }
+        public decimal total_part_completed { get; set; }
         public frm_main()
         {
             InitializeComponent();
@@ -34,7 +35,7 @@ namespace SlimlineManager
         {
             //update door number on each key entered
             string sql = "SELECT a.id,a.door_id,a.part_complete_date,a.time_for_part,a.op, forename + ' ' + surname as [name],a.part_percent_complete" +
-                " from dbo.door_part_completion_log a LEFT JOIN [user_info].[dbo].[user] b on staff_id = b.id WHERE door_id = " + txt_door_number.Text;
+                " from dbo.door_part_completion_log a LEFT JOIN [user_info].[dbo].[user] b on staff_id = b.id WHERE door_id = " + txt_door_number.Text + " ORDER BY a.id DESC";
 
             //MessageBox.Show(sql);
 
@@ -77,13 +78,30 @@ namespace SlimlineManager
 
         private void Btn_edit_Click(object sender, EventArgs e)
         {
+            //find the operation string and use that in another loop to count all the part % complete where operation = X
+            string operation = "";
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+            {
+                if (dataGridView1.Rows[i].DefaultCellStyle.BackColor == Color.CornflowerBlue)
+                {
+                    operation = dataGridView1.Rows[i].Cells[4].Value.ToString();
+                }
+            }
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+            {
+                if (dataGridView1.Rows[i].Cells[4].Value.ToString() == operation)
+                {
+                    total_part_completed  = total_part_completed + Convert.ToDecimal(dataGridView1.Rows[i].Cells[6].Value.ToString());
+                }
+            }
+            MessageBox.Show(total_part_completed.ToString());
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
                 if (dataGridView1.Rows[i].DefaultCellStyle.BackColor == Color.CornflowerBlue)
                 {
                     _id = dataGridView1.Rows[i].Cells[0].Value.ToString();
 
-                    frm_edit frm = new frm_edit(_id);
+                    frm_edit frm = new frm_edit(_id,total_part_completed);
                     this.Hide();
                     frm.Show();
                 }

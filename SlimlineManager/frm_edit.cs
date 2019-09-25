@@ -17,10 +17,12 @@ namespace SlimlineManager
         public int loop { get; set; }
         public string _id { get; set; }
         public int staff_id { get; set; }
-        public frm_edit(string passed_id)
+        public decimal part_validation { get; set; }
+        public frm_edit(string passed_id, decimal part_percent_)
         {
             InitializeComponent();
             _id = passed_id;
+            part_validation = part_percent_;
         }
 
         private void Frm_edit_Load(object sender, EventArgs e)
@@ -147,6 +149,8 @@ namespace SlimlineManager
         //maths for changing time for part
         private void maths_tfp()
         {
+            if (loop == 1)
+                return;
             //old time
             txt_old_time.Text = Convert.ToString(Math.Round((Convert.ToDecimal(dataGridView1.Rows[0].Cells[3].Value) / Convert.ToDecimal(dataGridView1.Rows[0].Cells[6].Value)), 2));
             //find the time for part if the percent complete was 1
@@ -178,6 +182,9 @@ namespace SlimlineManager
         //maths for changing part % complete#
         private void maths_ppc()
         {//time for part / new % number
+            //stop this from looping forever
+            if (loop == 2)
+                return;
             //variables to work this out
             string first_number = "0";
             string second_number = "0";
@@ -219,11 +226,12 @@ namespace SlimlineManager
 
         private void Txt_part_percent_complete_TextChanged(object sender, EventArgs e)
         {
-            //if (loop == 1) //stop it from looping FOREVER
-            //{
-            //    loop = 0;
-            //    return;
-            //}
+            if (loop == 2) //stop it from looping FOREVER
+            {
+                loop = 0;
+                return;
+            }
+
             //if last character = "." then halt
             if (txt_part_percent_complete.Text.EndsWith("."))
                 return;
@@ -231,12 +239,20 @@ namespace SlimlineManager
                 txt_part_percent_complete.Text = "";
             if (txt_part_percent_complete.Text == "" || txt_part_percent_complete.Text == " ")
                 return;
-
+            if (((part_validation - Convert.ToDecimal(dataGridView1.Rows[0].Cells[6].Value.ToString())) + Convert.ToDecimal(txt_part_percent_complete.Text)) > 1)
+            {
+                MessageBox.Show("You can't surpass 100% on a job.", "Validation", MessageBoxButtons.OK);
+                if (part_validation > 1)
+                    txt_part_percent_complete.Text = "0";
+                else
+                    txt_part_percent_complete.Text = dataGridView1.Rows[0].Cells[6].Value.ToString();
+            }
             else if (txt_part_percent_complete.Text == "0")
                 return;
 
             if (txt_part_percent_complete.Text != dataGridView1.Rows[0].Cells[6].Value.ToString())
             {
+                loop = 1;
                 maths_ppc();
                 txt_time_for_part.Enabled = false;
                 return;
@@ -251,10 +267,17 @@ namespace SlimlineManager
 
         private void Txt_time_for_part_TextChanged(object sender, EventArgs e)
         {
+            if (loop == 1)
+            {
+                loop = 0;
+                return;
+            }
             if (txt_time_for_part.Text != dataGridView1.Rows[0].Cells[3].Value.ToString())
             {
+                loop = 2;
                 maths_tfp();
                 txt_part_percent_complete.Enabled = false;
+
                 return;
             }
 
@@ -269,13 +292,40 @@ namespace SlimlineManager
                 MessageBox.Show("yeet");
                 string date = (dte_date.Value.ToString().Substring(0, 10) + dte_time.Value.ToString().Substring(10, 9));
                 DateTime part_date = Convert.ToDateTime(date);
-               
+
                 get_user();
                 update(part_date);
                 complete();
 
                 //daily goals needs to be updated last.
                 daily_goals(part_date);
+                if (txt_total_time.Enabled == true)
+                {
+                    using (SqlConnection conn = new SqlConnection(CONNECT.ConnectionString))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("usp_slimline_output_configurator_time_for_part", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            // MessageBox.Show(dataGridView1.Rows[0].Cells[0].Value.ToString());
+                            // int _id = Convert.ToInt32(dataGridView1.Rows[0].Cells[0].Value);
+                            //        int _door_id = Convert.ToInt32(dataGridView1.Rows[0].Cells[1].Value.ToString());
+
+
+                            cmd.Parameters.Add("@id", SqlDbType.VarChar).Value = Convert.ToInt32(_id);
+                            cmd.Parameters.Add("@door_id", SqlDbType.VarChar).Value = dataGridView1.Rows[0].Cells[1].Value.ToString();
+                            cmd.Parameters.Add("@total_time", SqlDbType.VarChar).Value = txt_total_time.Text;
+                            cmd.Parameters.Add("@operation", SqlDbType.VarChar).Value = cmb_operation.SelectedItem.ToString();
+
+
+
+
+                            conn.Open();
+
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
             }
             else
                 return;
@@ -289,7 +339,7 @@ namespace SlimlineManager
                 {
                     conn.Open();
                     staff_id = Convert.ToInt32(cmd.ExecuteScalar());
-                    MessageBox.Show(staff_id.ToString());
+                    MessageBox.Show("Staff ID: " + staff_id.ToString());
                 }
             }
         }
@@ -298,6 +348,7 @@ namespace SlimlineManager
             using (SqlConnection conn = new SqlConnection(CONNECT.ConnectionString))
             {
                 string sql = "update dbo.door_part_completion_log SET ";
+                sql = sql + "part_complete_date = '" + passed_date.ToString("yyyy-MM-dd HH:mm:ss") + "',";
                 sql = sql + "time_for_part = " + txt_time_for_part.Text + ",";
                 sql = sql + "op = '" + cmb_operation.Text + "',";
                 sql = sql + "staff_id = " + staff_id.ToString() + ",";
@@ -318,40 +369,38 @@ namespace SlimlineManager
         {
             //this updates the X_complete area ONLY if part percent is 1
             //maybe ask tom if this needs to add all the parts from the list rather than just 
-            if (txt_part_percent_complete.Text == "1")
+            if ((part_validation - Convert.ToDecimal(dataGridView1.Rows[0].Cells[6].Value.ToString())) + Convert.ToDecimal(txt_part_percent_complete.Text) == 1)
             {
                 string sql;
                 string operation = dataGridView1.Rows[0].Cells[4].Value.ToString();
                 sql = "update dbo.door SET ";
                 //all of the SL variants 
-                if (operation == "SL_Buff")
+                if (cmb_operation.Text == "SL_Buff")
                     sql = sql + "date_SL_buff_complete = GETDATE(), complete_SL_buff = 1 ";
-                if (operation == "SL_Pack")
+                if (cmb_operation.Text == "SL_Pack")
                     sql = sql + "date_pack_complete = GETDATE(), complete_pack = 1  ";
-                if (operation == "SL_Stores")
+                if (cmb_operation.Text == "SL_Stores")
                     sql = sql + "date_sl_stores_complete = GETDATE(), complete_SL_stores = 1 ";
                 //normal variants 
-                if (operation == "Assembly")
+                if (cmb_operation.Text == "Assembly")
                     sql = sql + "date_assembly_complete = GETDATE(), complete_assembly = 1 ";
-                if (operation == "Cutting")
+                if (cmb_operation.Text == "Cutting")
                     sql = sql + "date_cutting_complete = GETDATE(), complete_cutting = 1 ";
-                if (operation == "Prepping")
+                if (cmb_operation.Text == "Prepping")
                     sql = sql + "date_prepping_complete = GETDATE(), complete_prep = 1 ";
 
-                if (sql.Length > 25)
+                sql = sql + "WHERE id = " + dataGridView1.Rows[0].Cells[1].Value.ToString();
+                using (SqlConnection conn = new SqlConnection(CONNECT.ConnectionString))
                 {
-                    sql = sql + "WHERE id = " + dataGridView1.Rows[0].Cells[1].Value.ToString();
-                    using (SqlConnection conn = new SqlConnection(CONNECT.ConnectionString))
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
-                        using (SqlCommand cmd = new SqlCommand(sql, conn))
-                        {
-                            //MessageBox.Show(sql);
-                            conn.Open();
-                            MessageBox.Show(sql);// cmd.ExecuteNonQuery();
-                            conn.Close();
-                        }
+                        //MessageBox.Show(sql);
+                        conn.Open();
+                        MessageBox.Show(sql);// cmd.ExecuteNonQuery();
+                        conn.Close();
                     }
                 }
+
             }
         }
         private void daily_goals(DateTime passed_date)
@@ -379,7 +428,7 @@ namespace SlimlineManager
                 {
                     conn.Open();
                     actual_hours = Convert.ToDecimal(cmd.ExecuteScalar());
-                    MessageBox.Show(actual_hours.ToString());
+                    MessageBox.Show("Actual Hours: " + actual_hours.ToString());
                     conn.Close();
                     if (actual_hours == -1)
                     {
@@ -395,7 +444,7 @@ namespace SlimlineManager
                 {
                     //MessageBox.Show(sql);
                     conn.Open();
-                //    cmd.ExecuteNonQuery();
+                    //    cmd.ExecuteNonQuery();
                     conn.Close();
                 }
             }
