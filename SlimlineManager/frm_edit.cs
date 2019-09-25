@@ -289,7 +289,7 @@ namespace SlimlineManager
             DialogResult result = MessageBox.Show("Are you sure you want to update this record?", "UPDATE", MessageBoxButtons.YesNo);
             if (result == DialogResult.Yes)
             {
-                MessageBox.Show("yeet");
+                //MessageBox.Show("yeet");
                 string date = (dte_date.Value.ToString().Substring(0, 10) + dte_time.Value.ToString().Substring(10, 9));
                 DateTime part_date = Convert.ToDateTime(date);
 
@@ -299,7 +299,7 @@ namespace SlimlineManager
 
                 //daily goals needs to be updated last.
                 daily_goals(part_date);
-                if (txt_total_time.Enabled == true)
+                if (txt_total_time.Visible == true)
                 {
                     using (SqlConnection conn = new SqlConnection(CONNECT.ConnectionString))
                     {
@@ -339,7 +339,7 @@ namespace SlimlineManager
                 {
                     conn.Open();
                     staff_id = Convert.ToInt32(cmd.ExecuteScalar());
-                    MessageBox.Show("Staff ID: " + staff_id.ToString());
+                   // MessageBox.Show("Staff ID: " + staff_id.ToString());
                 }
             }
         }
@@ -355,12 +355,13 @@ namespace SlimlineManager
                 sql = sql + "part_percent_complete = " + txt_part_percent_complete.Text + ",";
                 sql = sql.Remove(sql.Length - 1);
                 sql = sql + " where id  = " + dataGridView1.Rows[0].Cells[0].Value.ToString();
+               // MessageBox.Show(sql);
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     conn.Open();
-                    //    cmd.ExecuteNonQuery();
-                    MessageBox.Show(sql);
+                    cmd.ExecuteNonQuery();
+                    //MessageBox.Show(sql);
                     conn.Close();
                 }
             }
@@ -396,7 +397,8 @@ namespace SlimlineManager
                     {
                         //MessageBox.Show(sql);
                         conn.Open();
-                        MessageBox.Show(sql);// cmd.ExecuteNonQuery();
+                        //MessageBox.Show(sql);
+                        cmd.ExecuteNonQuery();
                         conn.Close();
                     }
                 }
@@ -407,12 +409,12 @@ namespace SlimlineManager
         {
             //get date time fixed
             DateTime date_SOD = passed_date; //this is for the first minute of the day
-            MessageBox.Show(date_SOD.ToString());
+            //MessageBox.Show(date_SOD.ToString());
             date_SOD = date_SOD.AddHours(-date_SOD.Hour).AddMinutes(-date_SOD.Minute).AddSeconds(-date_SOD.Second);
-            MessageBox.Show(date_SOD.ToString());
+            //MessageBox.Show(date_SOD.ToString());
             DateTime date_EOD; //this is for the final minute of the day -- for daily goals calculation
             date_EOD = date_SOD.AddHours(23).AddMinutes(59).AddSeconds(59);
-            MessageBox.Show(date_EOD.ToString());
+           // MessageBox.Show(date_EOD.ToString());
 
 
             string sql = "select COALESCE(sum(time_for_part / 60),-1) as time from dbo.door_part_completion_log a " +
@@ -428,7 +430,7 @@ namespace SlimlineManager
                 {
                     conn.Open();
                     actual_hours = Convert.ToDecimal(cmd.ExecuteScalar());
-                    MessageBox.Show("Actual Hours: " + actual_hours.ToString());
+                  //  MessageBox.Show("Actual Hours: " + actual_hours.ToString());
                     conn.Close();
                     if (actual_hours == -1)
                     {
@@ -438,13 +440,13 @@ namespace SlimlineManager
                 sql = "UPDATE dbo.daily_department_goal " +
                 "SET actual_hours_slimline = " + actual_hours.ToString() +
                 " WHERE date_goal = '" + date_SOD.ToString("yyyy-MM-dd HH:mm:ss") + "'";
-                MessageBox.Show(sql);
+               // MessageBox.Show(sql);
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     //MessageBox.Show(sql);
                     conn.Open();
-                    //    cmd.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery();
                     conn.Close();
                 }
             }

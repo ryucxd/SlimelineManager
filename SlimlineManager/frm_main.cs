@@ -94,7 +94,7 @@ namespace SlimlineManager
                     total_part_completed  = total_part_completed + Convert.ToDecimal(dataGridView1.Rows[i].Cells[6].Value.ToString());
                 }
             }
-            MessageBox.Show(total_part_completed.ToString());
+            //MessageBox.Show(total_part_completed.ToString());
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
                 if (dataGridView1.Rows[i].DefaultCellStyle.BackColor == Color.CornflowerBlue)
