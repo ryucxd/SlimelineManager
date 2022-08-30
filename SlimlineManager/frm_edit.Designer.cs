@@ -182,6 +182,7 @@
             this.txt_part_percent_complete.TabIndex = 19;
             this.txt_part_percent_complete.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.txt_part_percent_complete.TextChanged += new System.EventHandler(this.Txt_part_percent_complete_TextChanged);
+            this.txt_part_percent_complete.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Txt_part_percent_complete_KeyPress);
             // 
             // txt_time_for_part
             // 
@@ -191,6 +192,7 @@
             this.txt_time_for_part.TabIndex = 16;
             this.txt_time_for_part.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.txt_time_for_part.TextChanged += new System.EventHandler(this.Txt_time_for_part_TextChanged);
+            this.txt_time_for_part.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Txt_time_for_part_KeyPress);
             // 
             // btn_close
             // 
@@ -318,6 +320,7 @@
             this.Controls.Add(this.lbl_title);
             this.Controls.Add(this.locked_part_complete_date);
             this.Controls.Add(this.dataGridView1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frm_edit";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

@@ -43,6 +43,8 @@ namespace SlimlineManager
                     conn.Close();
                 }
             }
+            if (string.IsNullOrEmpty(dataGridView1.Rows[0].Cells[6].Value.ToString()))
+                dataGridView1.Rows[0].Cells[6].Value = 0;
             //load the DGV into each text boxes. trying a new layout than last time.
             lbl_title.Text = "Door ID = " + dataGridView1.Rows[0].Cells[1].Value.ToString();
             locked_part_complete_date.Text = dataGridView1.Rows[0].Cells[2].Value.ToString();
@@ -329,6 +331,8 @@ namespace SlimlineManager
             }
             else
                 return;
+            MessageBox.Show("Relevant information has been updated!", "Yes", MessageBoxButtons.OK);
+            btn_close.PerformClick();
         }
 
         private void get_user()
@@ -451,6 +455,35 @@ namespace SlimlineManager
                 }
             }
 
+        }
+
+        private void Txt_part_percent_complete_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            //only allow 0-9 AND .
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '.')
+            {
+                e.Handled = true;
+            }
+            // only allow one decimal point
+            if (e.KeyChar == '.'
+                && (sender as TextBox).Text.IndexOf('.') > -1)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void Txt_time_for_part_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '.')
+            {
+                e.Handled = true;
+            }
+            // only allow one decimal point
+            if (e.KeyChar == '.'
+                && (sender as TextBox).Text.IndexOf('.') > -1)
+            {
+                e.Handled = true;
+            }
         }
     }
 }

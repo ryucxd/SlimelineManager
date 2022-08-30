@@ -18,6 +18,7 @@ namespace SlimlineManager
         public frm_main()
         {
             InitializeComponent();
+            
         }
 
         private void format()
@@ -89,12 +90,18 @@ namespace SlimlineManager
             }
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
-                if (dataGridView1.Rows[i].Cells[4].Value.ToString() == operation)
+                if (string.Equals(dataGridView1.Rows[i].Cells[4].Value.ToString(),operation,StringComparison.OrdinalIgnoreCase))
                 {
-                    total_part_completed  = total_part_completed + Convert.ToDecimal(dataGridView1.Rows[i].Cells[6].Value.ToString());
+                    if (string.IsNullOrEmpty(dataGridView1.Rows[i].Cells[6].Value.ToString()))
+                        dataGridView1.Rows[i].Cells[6].Value = 0;
+                    total_part_completed = total_part_completed + Convert.ToDecimal(dataGridView1.Rows[i].Cells[6].Value.ToString());
                 }
+                //if (dataGridView1.Rows[i].Cells[4].Value.ToString() == operation)
+                //{
+                //    total_part_completed  = total_part_completed + Convert.ToDecimal(dataGridView1.Rows[i].Cells[6].Value.ToString());
+                //}
             }
-            //MessageBox.Show(total_part_completed.ToString());
+           // MessageBox.Show(total_part_completed.ToString());
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
                 if (dataGridView1.Rows[i].DefaultCellStyle.BackColor == Color.CornflowerBlue)
@@ -102,8 +109,9 @@ namespace SlimlineManager
                     _id = dataGridView1.Rows[i].Cells[0].Value.ToString();
 
                     frm_edit frm = new frm_edit(_id,total_part_completed);
-                    this.Hide();
+                    
                     frm.Show();
+                    MessageBox.Show("test");
                 }
             }
         }
